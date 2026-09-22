@@ -1,27 +1,31 @@
-import  { app, BrowserWindow } from 'electron'
-
+import { app, BrowserWindow, ipcMain } from "electron";
+import path from "node:path";
 
 const createWindow = () => {
   const win = new BrowserWindow({
     width: 800,
-    height: 600
-  })
+    height: 600,
+    webPreferences: {
+      preload: path.join(import.meta.dirname, "preload.js"),
+    },
+  });
 
-  win.loadFile('index.html')
-}
+  win.loadFile("index.html");
+};
 
 app.whenReady().then(() => {
-  createWindow()
+  ipcMain.handle("ping", () => "pong");
+  createWindow();
 
-  app.on('activate', () => {
+  app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow()
+      createWindow();
     }
-  })
-})
+  });
+});
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
   }
-})
+});
